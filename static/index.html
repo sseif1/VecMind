@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VecMind – Semantic Knowledge Search</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .loading {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-4 md:p-6">
+  <div class="w-full max-w-4xl space-y-6">
+    <!-- Header -->
+    <header class="text-center">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+        VecMind
+      </h1>
+      <p class="text-sm text-slate-400 mt-2">
+        Semantic search over your docs. Ask questions in natural language.
+      </p>
+    </header>
+
+    <!-- Usage Guide (Collapsible) -->
+    <details class="bg-slate-900 border border-slate-800 rounded-lg p-4">
+      <summary class="cursor-pointer font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        How to Use VecMind
+      </summary>
+      <div class="mt-4 space-y-3 text-sm text-slate-300">
+        <div>
+          <h3 class="font-semibold text-indigo-400 mb-2">What is VecMind?</h3>
+          <p class="text-slate-400">
+            VecMind is a semantic knowledge search engine that understands the meaning of your questions, 
+            not just keywords. It searches through your documentation and returns the most relevant chunks.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold text-indigo-400 mb-2">How to Search</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-400 ml-2">
+            <li>Type your question in natural language (e.g., "What is VecMind for?")</li>
+            <li>Press <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Enter</kbd> or click the Search button</li>
+            <li>Results are ranked by relevance (score: 0-1, higher is better)</li>
+            <li>Click on example queries below to try them out</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-indigo-400 mb-2">Tips for Better Results</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-400 ml-2">
+            <li>Ask complete questions rather than single words</li>
+            <li>Use descriptive phrases (e.g., "How does authentication work?")</li>
+            <li>Try rephrasing if you don't get good results</li>
+            <li>Check the similarity score - results above 0.7 are usually very relevant</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-indigo-400 mb-2">Keyboard Shortcuts</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-400 ml-2">
+            <li><kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Enter</kbd> - Execute search</li>
+            <li><kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Esc</kbd> - Clear query</li>
+            <li><kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Ctrl/Cmd + K</kbd> - Focus search box</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- Search Section -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <label class="block text-sm font-medium">Ask a question</label>
+        <button id="clearBtn" 
+          class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+          style="display: none;">
+          Clear
+        </button>
+      </div>
+      
+      <div class="relative">
+        <textarea id="query" rows="3"
+          class="w-full rounded-lg bg-slate-900 border border-slate-700 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          placeholder="e.g. What is VecMind for? How does semantic search work?"></textarea>
+        <div id="loadingIndicator" class="hidden absolute top-3 right-3">
+          <div class="loading w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full"></div>
+        </div>
+      </div>
+
+      <!-- Example Queries -->
+      <div class="flex flex-wrap gap-2">
+        <span class="text-xs text-slate-500">Try:</span>
+        <button class="example-query text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors" 
+          data-query="What is VecMind for?">
+          What is VecMind for?
+        </button>
+        <button class="example-query text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+          data-query="How does semantic search work?">
+          How does semantic search work?
+        </button>
+        <button class="example-query text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+          data-query="What are the main features?">
+          What are the main features?
+        </button>
+      </div>
+
+      <button id="searchBtn"
+        class="w-full px-4 py-2.5 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+        <svg id="searchIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <span id="searchText">Search</span>
+      </button>
+    </section>
+
+    <!-- Results Section -->
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-medium">Results</h2>
+        <span id="resultCount" class="text-xs text-slate-500"></span>
+      </div>
+      <div id="results" class="space-y-3 text-sm"></div>
+      <div id="emptyState" class="text-center py-12 text-slate-500">
+        <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <p>Enter a question above to search your documentation</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const queryEl = document.getElementById("query");
+    const searchBtn = document.getElementById("searchBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const resultsDiv = document.getElementById("results");
+    const emptyState = document.getElementById("emptyState");
+    const resultCount = document.getElementById("resultCount");
+    const loadingIndicator = document.getElementById("loadingIndicator");
+    const searchText = document.getElementById("searchText");
+    const searchIcon = document.getElementById("searchIcon");
+
+    // Example query buttons
+    document.querySelectorAll(".example-query").forEach(btn => {
+      btn.addEventListener("click", () => {
+        queryEl.value = btn.dataset.query;
+        queryEl.focus();
+        performSearch();
+      });
+    });
+
+    // Clear button
+    clearBtn.addEventListener("click", () => {
+      queryEl.value = "";
+      queryEl.focus();
+      resultsDiv.innerHTML = "";
+      emptyState.style.display = "block";
+      clearBtn.style.display = "none";
+      resultCount.textContent = "";
+    });
+
+    // Show/hide clear button
+    queryEl.addEventListener("input", () => {
+      clearBtn.style.display = queryEl.value.trim() ? "block" : "none";
+    });
+
+    // Keyboard shortcuts
+    queryEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        performSearch();
+      }
+      if (e.key === "Escape") {
+        queryEl.value = "";
+        clearBtn.click();
+      }
+    });
+
+    // Global keyboard shortcut (Ctrl/Cmd + K)
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        queryEl.focus();
+      }
+    });
+
+    function highlight(content, query) {
+      const q = query.trim();
+      if (!q) return content;
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp("(" + escaped + ")", "ig");
+      return content.replace(regex, '<mark class="bg-yellow-500/40 px-0.5 rounded">$1</mark>');
+    }
+
+    function setLoading(isLoading) {
+      searchBtn.disabled = isLoading;
+      loadingIndicator.classList.toggle("hidden", !isLoading);
+      searchText.textContent = isLoading ? "Searching..." : "Search";
+      searchIcon.style.display = isLoading ? "none" : "block";
+    }
+
+    async function performSearch() {
+      const query = queryEl.value.trim();
+      if (!query) return;
+
+      setLoading(true);
+      emptyState.style.display = "none";
+      resultsDiv.innerHTML = "";
+      resultCount.textContent = "";
+
+      try {
+        const resp = await fetch("/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, top_k: 8 })
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          resultsDiv.innerHTML = `
+            <div class="rounded-lg border border-red-800 bg-red-900/20 p-4 text-red-400">
+              <p class="font-medium">Search failed</p>
+              <p class="text-sm mt-1">${err.detail || resp.statusText}</p>
+            </div>
+          `;
+          return;
+        }
+
+        const data = await resp.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          emptyState.style.display = "block";
+          emptyState.innerHTML = `
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p>No results found for "${query}"</p>
+            <p class="text-sm mt-2">Try rephrasing your question or using different keywords</p>
+          `;
+          return;
+        }
+
+        resultCount.textContent = `${data.length} result${data.length !== 1 ? 's' : ''}`;
+        resultsDiv.innerHTML = "";
+        
+        data.forEach((r, idx) => {
+          const card = document.createElement("div");
+          card.className = "fade-in rounded-lg border border-slate-800 bg-slate-900 p-4 hover:border-slate-700 transition-colors";
+          card.style.animationDelay = `${idx * 0.05}s`;
+
+          // Score color coding
+          const scoreColor = r.score > 0.7 ? "text-green-400" : r.score > 0.5 ? "text-yellow-400" : "text-slate-400";
+          
+          card.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-medium text-indigo-400">${r.document_title}</span>
+                <span class="text-xs text-slate-600">·</span>
+                <span class="text-xs text-slate-500">Chunk #${r.chunk_index}</span>
+                ${r.source_path ? `<span class="text-xs text-slate-600">·</span><span class="text-xs text-slate-500 truncate max-w-xs">${r.source_path.split('/').pop()}</span>` : ''}
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs ${scoreColor} font-medium">
+                  ${r.score.toFixed(3)}
+                </span>
+                <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full ${r.score > 0.7 ? 'bg-green-500' : r.score > 0.5 ? 'bg-yellow-500' : 'bg-slate-600'}" 
+                    style="width: ${r.score * 100}%"></div>
+                </div>
+              </div>
+            </div>
+            <p class="mt-2 leading-relaxed text-slate-200">
+              ${highlight(r.content, query)}
+            </p>
+          `;
+          resultsDiv.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        resultsDiv.innerHTML = `
+          <div class="rounded-lg border border-red-800 bg-red-900/20 p-4 text-red-400">
+            <p class="font-medium">Error performing search</p>
+            <p class="text-sm mt-1">${err.message}</p>
+          </div>
+        `;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    searchBtn.addEventListener("click", performSearch);
+
+    // Initial focus on search box
+    queryEl.focus();
+  </script>
+</body>
+</html>
