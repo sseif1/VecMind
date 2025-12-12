@@ -204,6 +204,7 @@ It’s intentionally small and opinionated. If this were production, I’d add:
 
 # Project Layout 
 
+```
 vecmind/
   app/
     __init__.py
@@ -221,7 +222,7 @@ vecmind/
   requirements.txt
   docker-compose.yml # Postgres + pgvector setup for local dev
   README.md
-
-  If you’re reading this because you’re reviewing my resume: i know its not perfect - looking a little rough but :) hope its somewhat pass-able (pls let it pass ) 
+```
+  If you’re reading this because you’re reviewing my resume: i know its not perfect - looking a little rough but :) hope its somewhat pass-able 
 
 anywhom... Thank you for your interest. 
