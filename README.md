@@ -229,7 +229,7 @@ vecmind/
 ```
 ---
 
-Demo : 
+# Demo : 
 
 <img width="549" height="680" alt="Screenshot 2025-12-12 at 2 10 47 AM" src="https://github.com/user-attachments/assets/32bd45b4-5faa-4c07-8ca3-667833e6d2f8" />
 
