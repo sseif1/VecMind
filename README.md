@@ -36,6 +36,10 @@ Think: “internal knowledge search for support / GTM / eng” – but small eno
 
 ---
 
+
+<img width="614" height="624" alt="Screenshot 2025-12-12 at 12 56 23 AM" src="https://github.com/user-attachments/assets/9a2a7c2a-466d-46ab-93a8-9a06306c9805" />
+
+---
 ## Quick Start (dev mode)
 
 ```bash
@@ -223,6 +227,14 @@ vecmind/
   docker-compose.yml # Postgres + pgvector setup for local dev
   README.md
 ```
+---
+
+Demo : 
+
+<img width="549" height="680" alt="Screenshot 2025-12-12 at 2 10 47 AM" src="https://github.com/user-attachments/assets/32bd45b4-5faa-4c07-8ca3-667833e6d2f8" />
+
+---
+
   If you’re reading this because you’re reviewing my resume: i know its not perfect - looking a little rough but :) hope its somewhat pass-able 
 
 anywhom... Thank you for your interest. 
