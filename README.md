@@ -201,4 +201,27 @@ It’s intentionally small and opinionated. If this were production, I’d add:
 
 …but this version shows the full semantic-search pipeline end-to-end without 15 microservices.
 
+
+# Project Layout 
+
+vecmind/
+  app/
+    __init__.py
+    config.py        # env + constants (API keys, DB URL, embedding model, etc.)
+    db.py            # Postgres connection helper (psycopg2)
+    models.sql       # schema + pgvector index
+    embeddings.py    # OpenAI + local-fallback embedding helper
+    ingest.py        # read docs, chunk, embed, insert into DB
+    main.py          # FastAPI app, endpoints, and search logic
+  static/
+    index.html       # Tailwind UI for searching
+  data/
+    sample.md        # example docs (you can replace these)
+  .env.example       # template for local env vars
+  requirements.txt
+  docker-compose.yml # Postgres + pgvector setup for local dev
+  README.md
+
+  If you’re reading this because you’re reviewing my resume: i know its not perfect - looking a little rough but :) hope its somewhat pass-able (pls let it pass ) 
+
 anywhom... Thank you for your interest. 
